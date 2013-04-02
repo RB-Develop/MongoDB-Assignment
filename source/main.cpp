@@ -23,13 +23,32 @@
  
 using namespace std;
  
-void insert( mongo::DBClientConnection & conn , const char * name , int num ) {
+void insertPerson(mongo::DBClientConnection & conn,  const char * name,  const char * age, mongo::BSONObj street, mongo::BSONObj history) {
     mongo::BSONObjBuilder obj;
-    obj.append( "name" , name );
-    obj.append( "num" , num );
+    obj.append("name" , name);
+	obj.append("age", age);
+	obj.append("address", street);
+	obj.append("history", history);
     conn.insert( "test.people" , obj.obj() );
 }
- 
+
+mongo::BSONObj createStreetBSON(const char * street, const char * city, const char * state, const char * zip) {
+	mongo::BSONObjBuilder obj;
+	obj.append("street", street);
+	obj.append("city", city);
+	obj.append("state", state);
+	obj.append("zip", zip);
+	return obj.obj();
+}
+
+mongo::BSONObj createHistoryBSON(const bool criminal, const bool unemployed, const bool hopeless) {
+	mongo::BSONObjBuilder obj;
+	obj.append("criminal", criminal);
+	obj.append("unemployed", unemployed);
+	obj.append("hopeless", hopeless);
+	return obj.obj();
+}
+
 int main( int argc, const char **argv ) {
  
     const char *port = "27017";
@@ -52,26 +71,19 @@ int main( int argc, const char **argv ) {
         conn.remove( "test.people" , query.obj() );
     }
  
-    insert( conn, "a", 1 );
-    insert( conn, "a", 2 );
-    insert( conn, "a", 3 );
-    insert( conn, "a", 4 );
-    insert( conn, "a", 5 );
-    insert( conn, "a", 6 );
-    insert( conn, "a", 7 );
-    insert( conn, "a", 8 );
-    insert( conn, "a", 9 );
-    insert( conn, "a", 10 );
- 
+    insertPerson(conn, "Joe", "33", createStreetBSON("123 Fake Street", "Faketon", "MA", "12345"), createHistoryBSON(false, true, true));
+	insertPerson(conn, "Bob", "14", createStreetBSON("Fakeadilly Street", "Faketon", "BB", "5554"), createHistoryBSON(true, false, false));
+	insertPerson(conn, "Claptrap", "Undetermined", createStreetBSON("Swagadilly", "Amsterfake", "NH", "15643"), createHistoryBSON(false, false, true));
+
     {
-        mongo::BSONObj query = BSON( "num" << BSON( "$nin" << BSON_ARRAY(1 << 5 << 10) ) );
-        cout << query << endl;
+        mongo::BSONObj query = BSON("address.city" << "Amsterfake" );
+        cout << "Current query: " << query << endl;
  
         auto_ptr<mongo::DBClientCursor> cursor = conn.query( "test.people" , query );
         cout << "using cursor" << endl;
         while ( cursor->more() ) {
             mongo::BSONObj obj = cursor->next();
-            cout << "\t" << obj.jsonString() << endl;
+			cout << "Data: \n" << obj.jsonString(mongo::Strict, true) << endl;
         }
  
     }
