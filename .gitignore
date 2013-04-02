@@ -4,7 +4,6 @@ Thumbs.db
 #Ignore files build by Visual Studio
 *.obj
 *.sdf
-*.exe
 *.pdb
 *.user
 *.aps
@@ -20,7 +19,6 @@ Thumbs.db
 *.cache
 *.ilk
 *.log
-[Bb]in
 *.sbr
 obj/
 [Rr]elease*/
@@ -29,3 +27,9 @@ _ReSharper*/
 *.tlog
 *.lastbuildstate
 *.idb
+data/db/test.0
+data/db/local.0
+data/db/local.ns
+data/db/test.1
+data/db/test.ns
+data/db/mongod.lock

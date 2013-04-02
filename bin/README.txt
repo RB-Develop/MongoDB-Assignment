@@ -1,0 +1,1 @@
+Start mongod.exe vanuit command prompt door middel van mongod.exe --config mongodb.conf.
